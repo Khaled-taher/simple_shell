@@ -14,7 +14,7 @@ int skip(char *str, const char *to_skip)
 
 	while (1)
 	{
-		for (int i = 0; i < len; i++)
+		for (i = 0; i < len; i++)
 		{
 			if (str[j] == to_skip[i])
 			{
