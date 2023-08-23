@@ -55,7 +55,7 @@ void get_command_helper(char *lineptr, int *command_num, int *error)
 			break;
 		}
 		if (lineptr[i] == ' ')
-			if (get_command_helper2(lineptr, error, i) == -1)
+			if (get_command_helper2(lineptr, i) == -1)
 				break;
 		if (lineptr[i] == ';' && lineptr[i + 1] != '\0')
 		{
@@ -93,7 +93,7 @@ void get_command_helper(char *lineptr, int *command_num, int *error)
  * @i: current index
  * Return: 0 if no break and -1 if break
  */
-int get_command_helper2(char *lineptr, int *error, int i)
+int get_command_helper2(char *lineptr, int i)
 {
 	if (lineptr[i + 1] == '#')
 		return (-1);
