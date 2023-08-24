@@ -89,7 +89,6 @@ void get_command_helper(char *lineptr, int *command_num, int *error)
 /**
  * get_command_helper2 - count numbers of commands and print error messages
  * @lineptr: pointer to line in the line
- * @error: flag to determine the occurance of erre
  * @i: current index
  * Return: 0 if no break and -1 if break
  */
