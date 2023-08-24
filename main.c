@@ -9,8 +9,7 @@
  */
 int main(__attribute__((unused))int arc, __attribute__((unused)) char **arv,
 		char *environ[])
-{
-	int i = 0, status = 0;
+{	int i = 0, status = 0;
 	char **argv, **command, *lineptr, **stat;
 	size_t n;
 	list_t *env = NULL;
@@ -20,8 +19,7 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **arv,
 	{
 		printf("#cisfun$ ");
 		if (getline(&lineptr, &n, stdin) == -1)
-		{
-			perror("error:");
+		{	perror("error:");
 			continue;
 		}
 		i = 0;
@@ -95,6 +93,7 @@ int fork_proc(char **argv, list_t *env)
 void _free_arr(char **arr)
 {
 	int i = 0;
+
 	while (arr[i] != NULL)
 	{
 		free(arr[i]);

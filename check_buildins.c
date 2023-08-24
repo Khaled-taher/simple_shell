@@ -37,7 +37,7 @@ int check_builtin(char **argv, list_t *env)
 	{
 		if (argv[1] != NULL && argv[2] != NULL && argv[3] == NULL)
 		{
-			return(_setenv(env, argv[1], argv[2], 1));
+			return (_setenv(env, argv[1], argv[2], 1));
 		}
 		errno = EINVAL;
 		perror("Error");
@@ -62,45 +62,9 @@ int check_builtin_helper(char **argv, list_t *env)
 		perror("Error");
 		return (-1);
 	}
-	return (98); /* remove it after complete below code */
-	if (_strcmp(argv[0], "cd") == 0)
-	{
-		/*if ((argv[1] == NULL || "~") && argv[2] == NULL)
-		{
-			chdir_home();
-		}*/
-		/*else if (argv[1] == "-" && argv[2] == NULL)
-		{
-			func to change dir to previous dir
-		}
-		else if (argv[1] != NULL && argv[2] == NULL)
-		{
-			func to change dir to argv[1]
-		}
-		else
-		{
-			errno = EINVAL;
-			perror("Error");
-			return (-1)
-		}*/
-	}
-	return (0);
+	return (98);
 }
 
-/**
- * check_builtin_helper2 - selects the correct function to perform the opration
- * @argv: argument of command
- * @env: pointer to system environment
- * Return: 0 if succees and 98 if not found and -1 in error
- */
-/*
-int check_builtin_helper2(char **argv, list_t *env)
-{
-	if (_strcmp(argv[0], "alias") == 0)
-	{
-	}
-}
-*/
 /**
  * is_num - check if string in all digits
  * @str: str to be checked
