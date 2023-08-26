@@ -1,39 +1,89 @@
 #include "main.h"
 
+void after_spaces(char *str, int *i)
+{
+	while (str[*i] == ' ')
+		++*i;
+}
+
+int init_commands(char ***commands, char *lineptr)
+{
+	int start = 0, final = 0, commands_num = 1, error = 0;
+
+	after_spaces(lineptr, &start);
+	final = start;
+	while (!error && lineptr[final])
+	{
+		if (lineptr[final] == ';' || lineptr[final] == '|' ||
+			lineptr[final] == '&' ||
+			(final && lineptr[final] == '#' && lineptr[final - 1] == ' '))
+		{
+			if (final && lineptr[final - 1] == ' ' && lineptr[final] == '#')
+			{
+				commands_num++;
+				break;
+			}
+			if (lineptr[final + 1] != '&' && lineptr[final] == '&')
+				error = 1;
+			if (lineptr[final + 1] != '|' && lineptr[final] == '|')
+				error = 1;
+			if (lineptr[final] == '&' || lineptr[final] == '|')
+				final++;
+			commands_num++;
+			after_spaces(lineptr, &final);
+			start = final;
+		}
+		final++;
+	}
+	if (error)
+	{
+		write(STDERR_FILENO, "ERROR", 5);
+		return (1);
+	}
+	*commands = malloc(sizeof(char *) * (commands_num + 1));
+	return (0);
+}
 /**
  * get_command - get the commands and their arguments from line
  * @lineptr: poiner to line
  * Return: return pointer to commands or NULL in error
  */
-char **get_command(char *lineptr)
+char **get_commands(char *lineptr)
 {
-	char **command = NULL, *token;
-	int i = 0, error = 0, command_num = 1;
+	char **commands = NULL;
+	int i = 0, start = 0, final = 0;
 
-	get_command_helper(lineptr, &command_num, &error);
-
-	if (error == 1)
+	fflush(stdout);
+	if (init_commands(&commands, lineptr))
+		return (NULL);
+	after_spaces(lineptr, &start);
+	final = start;
+	while (1)
 	{
-		helper_error(command);
-		return (command);
+		if (lineptr[final] == ';' || lineptr[final] == '|' ||
+			lineptr[final] == '&' || 
+			(final && lineptr[final] == '#' && lineptr[final - 1] == ' ') ||
+			!lineptr[final])
+		{
+			if (final && lineptr[final - 1] == ' ' && lineptr[final] == '#')
+			{
+				commands[i++] = _strndup(&lineptr[start], final - start);
+				break;
+			}
+			commands[i++] = _strndup(&lineptr[start], final - start);
+			if (!lineptr[final])
+				break;
+			if (lineptr[final] == '&' || lineptr[final] == '|')
+				final++;
+			final++;
+			after_spaces(lineptr, &final);
+			start = final;
+			continue;
+		}
+		final++;
 	}
-
-	command = malloc(sizeof(char *) * (command_num + 1));
-	if (command == NULL)
-	{
-		perror("Error:");
-		helper_error(command);
-		return (command);
-	}
-	token = _strtok(lineptr, "#;\n");
-	while (token != NULL && i < command_num)
-	{
-		command[i] = strdup(token);
-		token = _strtok(NULL, " \n");
-		i++;
-	}
-	command[i] = NULL;
-	return (command);
+	commands[i] = NULL;
+	return (commands);
 }
 
 /**
@@ -100,7 +150,7 @@ int get_command_helper2(char *lineptr, int i)
 }
 /**
  * helper_error - to change variable when error occurs
- * @command: poiner to commands
+ * @command: pointer to commands
  * Return: nothing
  */
 void helper_error(char **command)

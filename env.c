@@ -7,12 +7,15 @@
  */
 void _print_environ(list_t *head)
 {
-	list_t *h;
+	list_t *h = NULL;
 
+	if (!head)
+		return;
 	h = head;
 	while (h)
 	{
-		printf("%s\n", h->str);
+		write(STDOUT_FILENO, h->str, _strlen(h->str));
+		write(STDOUT_FILENO, "\n", 1);
 		h = h->next;
 	}
 }
@@ -31,16 +34,17 @@ list_t *_cpy_environ(char **environ)
 	while (environ[i] != NULL)
 	{
 		new = malloc(sizeof(list_t));
-		if (new == NULL)
+		if (!new)
 		{
-			perror("Error:");
+			_free_environ(head);
+			head = NULL;
+			write(STDERR_FILENO, "Error:\n", 7);
+			break;
 		}
 		new->str = _strdup(environ[i]);
 		new->next = NULL;
-		if (head == NULL)
-		{
+		if (!head)
 			head = new;
-		}
 		else
 		{
 			last = head;
@@ -63,6 +67,9 @@ void _free_environ(list_t *head)
 {
 	list_t *tmp;
 
+	if (!head)
+		return;
+
 	while (head)
 	{
 		tmp = head;
@@ -83,6 +90,8 @@ char **list_to_arr(list_t *head)
 	int len = 0, i;
 	list_t *current;
 
+	if (!head)
+		return (NULL);
 	current = head;
 	while (current)
 	{

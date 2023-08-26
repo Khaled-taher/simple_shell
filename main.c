@@ -1,5 +1,19 @@
 #include "main.h"
 
+void print_arr(char **arr)
+{
+	size_t i = 0;
+
+	if (!arr || !*arr)
+		return;
+	while (arr[i])
+	{
+		printf("%s\n", arr[i]);
+		++i;
+	}
+	fflush(stdout);
+}
+
 /**
  * main - execve example
  * @arc: number of argument
@@ -8,36 +22,42 @@
  * Return: Always 0.
  */
 int main(__attribute__((unused))int arc, __attribute__((unused)) char **arv,
-		char *environ[])
+		char *_environ[])
 {
-	int i = 0, status = 0;
-	char **argv, **command, *lineptr, **stat;
-	size_t n;
+	int i = 0, status = 0, is_interactive = 0;
+	char **argv = NULL, **commands = NULL, *lineptr = NULL, **stat = NULL;
+	size_t n = 0, bytes_read = 0;
 	list_t *env = NULL;
 
-	env = _cpy_environ(environ);
-	_getline(&lineptr, &n, stdin);
-	if (_strcmp("exit\n", lineptr) == 0)
-		exit(0);
-	
+	env = _cpy_environ(_environ);		
+	is_interactive = isatty(STDIN_FILENO);
 	while (1)
-	{	write(STDOUT_FILENO,"#cisfun$ ",10);
-		if (_getline(&lineptr, &n, stdin) == -1)
+	{
+		if (is_interactive)
+			write(STDOUT_FILENO, "#cisfun$ ", 10);
+		bytes_read = getline(&lineptr, &n, stdin);
+		if (bytes_read == ULLONG_MAX)
 		{
-			perror("error:");
-			continue;
+			if (is_interactive)
+				write(1, "\n", 1);
+			free(lineptr);
+			break;
 		}
+		
 		i = 0;
-		command = get_command(lineptr);
-		if (command == NULL)
-			continue;
-		while (command[i] != NULL)
+		commands = get_commands(lineptr);
+		free(lineptr);
+		lineptr = NULL;
+		print_arr(commands);
+/*
+		while (commands && commands[i] != NULL)
 		{
-			argv = get_argv(command[i]);
+			argv = get_argv(commands[i]);
 			if (argv == NULL)
 				continue;
 			if (check_builtin(argv, env) == 98)
-			{	stat = check_path(env, argv, &status);
+			{	
+				stat = check_path(env, argv, &status);
 				if (status == 0)
 				{
 					fork_proc(stat, env);
@@ -50,9 +70,10 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **arv,
 			}
 			i++;
 			_free_arr(argv);
-		}
-		_free_arr(command);
+		}*/
+		_free_arr(commands);
 	}
+	_free_environ(env);
 	return (0);
 }
 

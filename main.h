@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <limits.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -31,7 +32,7 @@ int skip(char *str, const char *to_skip);
 int str_len(const char *str);
 char *_strtok(char *str, const char *delim);
 int get_argv_helper(char *lineptr, int *arg_num, int *char_num);
-char **get_command(char *lineptr);
+char **get_commands(char *lineptr);
 void get_command_helper(char *lineptr, int *command_num, int *error);
 int get_command_helper2(char *lineptr, int i);
 void helper_error(char **command);
