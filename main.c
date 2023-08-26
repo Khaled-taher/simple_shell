@@ -119,6 +119,8 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **argv,
 		commands = get_commands(lineptr);
 		free(lineptr);
 		lineptr = NULL;
+		if (!commands)
+			break;
 		result = execute_commands(&status, commands, &env, line_num++, argv[0]);
 		_free_arr(commands);
 		if(!result)

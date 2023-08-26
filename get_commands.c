@@ -12,6 +12,8 @@ int init_commands(char ***commands, char *lineptr)
 
 	after_spaces(lineptr, &start);
 	final = start;
+	if (start == _strlen(lineptr) - 1)
+		return (1);
 	while (!error && lineptr[final])
 	{
 		if (lineptr[final] == ';' || lineptr[final] == '|' ||
