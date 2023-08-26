@@ -5,66 +5,54 @@
  * @lineptr: poiner to line
  * Return: return pointer to arg or NULL in error
  */
-char **get_argv(char *lineptr)
+char **get_argv(char *command)
 {
-	char **argv, *token;
-	int i = 0, arg_num = 1, char_num = 0;
+	char **argv;
+	int i = 0;
+	size_t len = 0;
 
-	if (get_argv_helper(lineptr, &arg_num, &char_num) == -1)
+	len = get_tokens_num(command);
+	if (!len)
 		return (NULL);
-
-	if (char_num == 0)
-		return (NULL);
-	i = 0;
-	argv = malloc(sizeof(char *) * (arg_num + 1));
-	if (argv == NULL)
+	argv = malloc(sizeof(char *) * (len + 1));
+	argv[0] = _strtok(command, " ");
+	while (argv[i])
 	{
-		perror("Error:");
-		return (NULL);
-	}
-	token = strtok(lineptr, " \n");
-	if (token == NULL)
-		return (NULL);
-	while (token != NULL && i < arg_num)
-	{
-		argv[i] = strdup(token);
-		token = strtok(NULL, " \n");
 		i++;
+		argv[i] = _strtok(NULL, " ");
 	}
-	argv[i] = NULL;
 
 	return (argv);
 }
 
 /**
  * get_argv_helper - get the arguments from line
- * @lineptr: poiner to line
+ * @lineptr: pointer to line
  * @arg_num: number of argument
  * @char_num: number of chars
  * Return: return 0 if succeed and -1 if error
  */
-int get_argv_helper(char *lineptr, int *arg_num, int *char_num)
+size_t get_tokens_num(char *command)
 {
-	int i = 0;
+	int i = 0, num = 1;
 
-	while (lineptr[i] != '\0')
+	if (!command || !*command)
+		return (0);
+
+	while (command[i])
 	{
-		if (i == 0 && lineptr[i] == '#')
-			break;
-
-		if (lineptr[i] != ' ')
-			(*char_num)++;
-
-		if (lineptr[i] == ' ' && lineptr[i + 1] != ' ')
+		if (command[i] == ' ')
 		{
-			if (lineptr[i + 1] == ';')
+			while (command[i] == ' ')
+				i++;
+			if (command[i] == '\n')
 				break;
-			if (lineptr[i + 1] == '#')
-				break;
-			if (lineptr[i + 1] != '\n')
-				(*arg_num)++;
+			if (command[i])
+				num++;
+			continue;
 		}
 		i++;
 	}
-	return (0);
+	return (num);
 }
+

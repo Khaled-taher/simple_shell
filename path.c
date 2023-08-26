@@ -1,120 +1,56 @@
 #include "main.h"
 
 /**
- * build_path - build linked list of paths
- * @path: pointer pointed to path varaible
- * Return: pointer to first node of path
- */
-list_t *build_path(char *path)
-{
-	list_t *head = NULL;
-	char *token;
-	list_t *new, *last;
-
-	token = strtok(path, ":");
-	while (token != NULL)
-	{
-		new = malloc(sizeof(list_t));
-		if (new == NULL)
-		{
-			printf("Error!!");
-		}
-		new->str = _strdup(token);
-		new->next = NULL;
-		if (head == NULL)
-		{
-			head = new;
-		}
-		else
-		{
-			last = head;
-			while (last->next)
-				last = last->next;
-			last->next = new;
-		}
-		token = strtok(NULL, ":");
-	}
-	return (head);
-}
-
-/**
  * check_path - check if comamnd in path
  * @env: pointer pointed to enviroment
  * @argv: pointer pointed to argument
  * @status: status of operation
  * Return: pointer 0 if success and -1 in fail and 98 if not found
  */
-char **check_path(list_t *env, char **argv, int *status)
+char *get_path(list_t *env, char **argv, int *status)
 {
-	int len = 0, i;
-	char *command, **new_argv;
-	list_t *path;
-	struct stat st;
+	char *tmp = NULL, *path = NULL, *global_path = NULL;
 
-	if (stat(argv[0], &st) == 0)
+	if (!argv || !argv[0] || !argv[0][0])
+		return (NULL);
+
+	if (argv[0][0] == '/')
+		path = _strdup(argv[0]);
+	else if (argv[0][0] == '.' && argv[0][1] == '/')
 	{
-		(*status) = 0;
-		return (argv);
+		path = _getenv(env, "PWD");
+		concat(&path, "/");
+		concat(&path, &argv[0][2]);
 	}
-	while (argv[len] != NULL)
-		len++;
-	path = build_path(_getenv(env, "PATH"));
-	while (path)
+	else
 	{
-		command = check_path_helper(path, argv[0], status);
-		if (stat(command, &st) == 0)
+		global_path = _getenv(env, "PATH");
+		tmp = _strtok(global_path, ":");
+		while (tmp)
 		{
-			new_argv = malloc(sizeof(char *) * (len + 1));
-			if (new_argv == NULL)
+			path = _strdup(tmp);
+			concat(&path, "/");
+			concat(&path, argv[0]);
+			tmp = _strtok(NULL, ":");
+			if (access(path, F_OK && X_OK) == -1)
 			{
-				(*status) = -1;
-				free(command);
-				return (argv);
+				if (!tmp)
+					break;
+				free(path);
 			}
-			new_argv[0] = _strdup(command);
-			free(command);
-			for (i = 1; i < len; i++)
-				new_argv[i] = argv[i];
-			_free_environ(path);
-			(*status) = 0;
-			return (new_argv);
+			else
+				break;
 		}
-		path = path->next;
+		free(global_path);
 	}
-	_free_environ(path);
-	(*status) = 98;
-	return (argv);
-}
 
-/**
- * check_path_helper - check if comamnd in path
- * @path: pointer pointed to enviroment
- * @argv: pointer pointed to argument
- * @status: status of operation
- * Return: pointer 0 if success and -1 in fail and 98 if not found
- */
-char *check_path_helper(list_t *path, char *argv, int *status)
-{
-	int len_str, len_argv0, i = 0;
-	char *command;
-
-	len_str = _strlen(path->str);
-	len_argv0 = _strlen(argv);
-
-	command = malloc(sizeof(char) * (len_str + len_argv0 + 2));
-	if (command == NULL)
+	if (access(path, F_OK && X_OK) == -1)
 	{
-		(*status) = -1;
+		*status = 127;
+		free(path);
 		return (NULL);
 	}
-	for (i = 0; i < len_str; i++)
-		command[i] = path->str[i];
-	command[i] = '/';
-	i++;
-	for (i = len_str + 1; i < len_str + len_argv0 + 1; i++)
-		command[i] = argv[i - len_str - 1];
-	command[i] = '\0';
-	return (command);
+	return (path);
 }
 
 /**
@@ -133,24 +69,24 @@ char *_getenv(list_t *head, char *name)
 	current = head;
 	while (current)
 	{
-		value = strndup(current->str, len);
-		if (strcmp(name, value) == 0 && current->str[len] == '=')
+		value = _strndup(current->str, len);
+		if (!_strcmp(name, value) && current->str[len] == '=')
 			break;
+		free(value);
+		value = NULL;
 		current = current->next;
 	}
+	if (!value)
+		return (NULL);
 	free(value);
+
 	i = len + 1;
 	while (current->str[i] != '\0')
-	{
 		i++;
-	}
+
 	i = i - len;
 	value = malloc(sizeof(char) * i);
-	if (value == NULL)
-	{
-		printf("Error:");
-		return (NULL);
-	}
+	
 	i = len + 1;
 	while (current->str[i] != '\0')
 	{

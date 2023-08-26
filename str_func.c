@@ -1,4 +1,35 @@
 #include "main.h"
+/**
+* concat - string concat
+* @dest: dest (self change - pass by reference)
+* @src: src
+* Return: A pointer to dest
+*/
+char *concat(char **dest, char *src)
+{
+	char *temp = NULL;
+	size_t i = 0, len = 0, len2 = 0, len3 = 0;
+
+	len = _strlen(*dest);
+	len2 = _strlen(src);
+	len3 = len + len2;
+	temp = malloc(sizeof(char) * (len3 + 1));
+	if (!temp)
+		return (NULL);
+	while (len3)
+	{
+		if (i < len)
+			temp[i] = (*dest)[i];
+		else
+			temp[i] = src[i - len];
+		++i;
+		--len3;
+	}
+	temp[i] = '\0';
+	free(*dest);
+	*dest = temp;
+	return (temp);
+}
 
 /**
  * _strlen - concatinate to strings
@@ -36,8 +67,6 @@ char *_strdup(char *str)
 	str2[i] = '\0';
 	return (str2);
 }
-
-#include "main.h"
 
 /**
  * _strcmp - compare between to strings

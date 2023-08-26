@@ -83,6 +83,7 @@ char **get_commands(char *lineptr)
 		final++;
 	}
 	commands[i] = NULL;
+	commands[i - 1][_strlen(commands[i - 1]) - 1] = '\0';
 	return (commands);
 }
 
