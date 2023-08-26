@@ -79,7 +79,6 @@ int execute_commands(int *status, char **commands, list_t **env, int line_number
 				write(STDERR_FILENO, ": not found\n", 12);
 			}
 			free(path);
-			printf("\n<%i>", *status);
 			fflush(stdout);
 		}
 		free(argv);
