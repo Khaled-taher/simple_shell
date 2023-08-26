@@ -65,5 +65,6 @@ int check_builtin_helper2(char **argv, list_t *env);
 
 char *concat(char **dest, char *src);
 char *get_path(list_t *env, char **argv, int *status);
+char *unsigned_to_str(int line_n);
 #endif /*MAIN_H*/
 

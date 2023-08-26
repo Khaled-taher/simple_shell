@@ -1,11 +1,12 @@
 #include "main.h"
 
 /**
- * check_builtin - selects the correct function to perform the operation
- * @argv: argument of command
- * @env: pointer to system environment
- * Return: 0 if succees and 98 if not found and -1 in error and -2 if exit
- */
+* check_builtin - selects the correct function to perform the operation
+* @argv: argument of command
+* @env: pointer to system environment
+* @status: status
+* Return: 0 if succees and 98 if not found and -1 in error and -2 if exit
+*/
 int check_builtin(char **argv, list_t **env, int *status)
 {
 	if (!_strcmp(argv[0], "env"))
@@ -34,26 +35,29 @@ int check_builtin(char **argv, list_t **env, int *status)
 			*status = 2;
 			return (0);
 		}
-	}/*
-	if (!_strcmp(argv[0], "setenv"))
-	{
-		if (argv[1] != NULL && argv[2] != NULL && argv[3] == NULL)
-		{
-			return (_setenv(*env, argv[1], argv[2], 1));
-		}
-		write(STDERR_FILENO, "Error", 5);
-		*status = 127;
-		return (-1);
-	}*/
+	}
+/*
+*	if (!_strcmp(argv[0], "setenv"))
+*	{
+*		if (argv[1] != NULL && argv[2] != NULL && argv[3] == NULL)
+*		{
+*			return (_setenv(*env, argv[1], argv[2], 1));
+*		}
+*		write(STDERR_FILENO, "Error", 5);
+*		*status = 127;
+*		return (-1);
+*	}
+*/
 	return (check_builtin_helper(argv, env, status));
 }
 
 /**
- * check_builtin_helper - selects the correct function to perform the operation
- * @argv: argument of command
- * @env: pointer to system environment
- * Return: 0 if succees and 98 if not found and -1 in error
- */
+* check_builtin_helper - selects the correct function to perform the operation
+* @argv: argument of command
+* @env: pointer to system environment
+* @status: status
+* Return: 0 if succees and 98 if not found and -1 in error
+*/
 int check_builtin_helper(char **argv, list_t **env, int *status)
 {
 	if  (_strcmp(argv[0], "unsetenv") == 0)

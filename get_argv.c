@@ -2,7 +2,7 @@
 
 /**
  * get_argv - get the arguments from line
- * @lineptr: poiner to line
+ * @command: poiner to line
  * Return: return pointer to arg or NULL in error
  */
 char **get_argv(char *command)
@@ -26,12 +26,10 @@ char **get_argv(char *command)
 }
 
 /**
- * get_argv_helper - get the arguments from line
- * @lineptr: pointer to line
- * @arg_num: number of argument
- * @char_num: number of chars
- * Return: return 0 if succeed and -1 if error
- */
+* get_tokens_num - get number of tokens
+* @command: command
+* Return: number of tokens
+*/
 size_t get_tokens_num(char *command)
 {
 	int i = 0, num = 1;

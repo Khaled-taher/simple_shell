@@ -1,55 +1,39 @@
 #include "main.h"
-/*
-void print_arr(char **arr)
-{
-	size_t i = 0;
 
-	if (!arr || !*arr)
-		return;
-	while (arr[i])
-	{
-		printf("%s\n", arr[i]);
-		++i;
-	}
-	fflush(stdout);
-}*/
-
-char *unsigned_to_str(int line_n)
-{
-	char *str = NULL;
-	int tmp = 0, len = 0;
-
-	if (!line_n)
-		return (_strdup("0"));
-	tmp = line_n;
-	while (tmp)
-	{
-		tmp /= 10;
-		len++;
-	}
-	str = malloc(sizeof(char) * (len + 1));
-	if (!str)
-		return (NULL);
-	tmp = line_n;
-	str[len] = '\0';
-	while (tmp)
-	{
-		str[len - 1] = (tmp % 10) + '0';
-		--len;
-		tmp /= 10;
-	}
-	return (str);
-}
-
-/*
-* 1 -> again
-* 0 -> exit
+/**
+* print_error - print error
+* @line_number: line number
+* @p_name: program name
+* @argv: argv
 */
-int execute_commands(int *status, char **commands, list_t **env, int line_number, char *p_name)
+void print_error(int line_number, char *p_name, char **argv)
+{
+	char *line_n = NULL;
+
+	write(STDERR_FILENO, p_name, _strlen(p_name));
+	write(STDERR_FILENO, ": ", 2);
+	line_n = unsigned_to_str(line_number);
+	write(STDERR_FILENO, line_n, _strlen(line_n));
+	free(line_n);
+	write(STDERR_FILENO, ": ", 2);
+	write(STDERR_FILENO, argv[0], _strlen(argv[0]));
+	write(STDERR_FILENO, ": not found\n", 12);
+}
+/**
+* execute_commands - execute commands
+* @status: status
+* @commands: commands
+* @env: env
+* @line_number: line number
+* @p_name: p name
+* Return: return
+*/
+int execute_commands(int *status, char **commands, list_t **env,
+				int line_number, char *p_name)
 {
 	size_t i = 0;
 	int is_built = 0;
-	char **argv = NULL, *path = NULL, *line_n = NULL;
+	char **argv = NULL, *path = NULL;
 
 	while (commands && commands[i])
 	{
@@ -68,18 +52,8 @@ int execute_commands(int *status, char **commands, list_t **env, int line_number
 			if (path)
 				fork_proc(path, argv, *env, status);
 			else
-			{
-				write(STDERR_FILENO, p_name, _strlen(p_name));
-				write(STDERR_FILENO, ": ", 2);
-				line_n = unsigned_to_str(line_number);
-				write(STDERR_FILENO, line_n, _strlen(line_n));
-				free(line_n);
-				write(STDERR_FILENO, ": ", 2);
-				write(STDERR_FILENO, argv[0], _strlen(argv[0]));
-				write(STDERR_FILENO, ": not found\n", 12);
-			}
+				print_error(line_number, p_name, argv);
 			free(path);
-			fflush(stdout);
 		}
 		free(argv);
 		i++;
@@ -90,8 +64,8 @@ int execute_commands(int *status, char **commands, list_t **env, int line_number
 /**
  * main - execve example
  * @arc: number of argument
- * @arv: pointer to argument
- * @environ: pointer to environment
+ * @argv: pointer to argument
+ * @_environ: pointer to environment
  * Return: Always 0.
  */
 int main(__attribute__((unused))int arc, __attribute__((unused)) char **argv,
@@ -102,7 +76,7 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **argv,
 	size_t n = 0, bytes_read = 0;
 	list_t *env = NULL;
 
-	env = _cpy_environ(_environ);		
+	env = _cpy_environ(_environ);
 	is_interactive = isatty(STDIN_FILENO);
 	while (1)
 	{
@@ -123,7 +97,7 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **argv,
 			break;
 		result = execute_commands(&status, commands, &env, line_num++, argv[0]);
 		_free_arr(commands);
-		if(!result)
+		if (!result)
 			break;
 	}
 	_free_environ(env);
@@ -131,11 +105,13 @@ int main(__attribute__((unused))int arc, __attribute__((unused)) char **argv,
 }
 
 /**
- * fork_proc - creat child to run a coomand
- * @argv: argument passed to new process
- * @env: pointer to environment
- * Return: always (0)
- */
+* fork_proc - creat child to run a coomand
+* @argv: argument passed to new process
+* @env: pointer to environment
+* @path: path
+* @status: status
+* Return: always (0)
+*/
 int fork_proc(char *path, char **argv, list_t *env, int *status)
 {
 	int pid = 0, i = 0;
@@ -170,7 +146,7 @@ int fork_proc(char *path, char **argv, list_t *env, int *status)
 void _free_arr(char **arr)
 {
 	int i = 0;
-	
+
 	while (arr[i] != NULL)
 	{
 		free(arr[i]);
