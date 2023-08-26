@@ -79,6 +79,8 @@ int execute_commands(int *status, char **commands, list_t **env, int line_number
 				write(STDERR_FILENO, ": not found\n", 12);
 			}
 			free(path);
+			printf("\n<%i>", *status);
+			fflush(stdout);
 		}
 		free(argv);
 		i++;
@@ -151,6 +153,7 @@ int fork_proc(char *path, char **argv, list_t *env, int *status)
 		exit(EXIT_FAILURE);
 	}
 	waitpid(pid, status, 0);
+	*status = WEXITSTATUS(*status);
 	while (_env[i])
 		free(_env[i++]);
 	free(_env);
